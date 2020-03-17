@@ -39,7 +39,6 @@ def conv_block(units, conv_name, bn_name, activation='relu',
     return layer_wrapper
 
 def classifier(base_layers, nb_classes=2, trainable=False):
-    input_shape = (None, 7, 7, 512)
 
     out = TimeDistributed(Flatten(name='flatten'))(base_layers)
     out = TimeDistributed(Dense(4096, activation='relu', name='fc1'))(out)
@@ -98,4 +97,4 @@ def nn_base(input_tensor=None, trainable=False, batch_normalization=False):
     x = conv_block(512, 'block5_conv2', 'block5_bn2', bn=batch_normalization, axis=bn_axis)(x)
     x = conv_block(512, 'block5_conv3', 'block5_bn3', bn=batch_normalization, axis=bn_axis)(x)
 
-    return classifier(x)
+    return x
