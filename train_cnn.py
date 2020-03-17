@@ -11,8 +11,9 @@ import numpy as np
 import random
 import pprint
 import json
-import sys
 import time
+import sys
+import cv2
 import os
 
 import tensorflow as tf
