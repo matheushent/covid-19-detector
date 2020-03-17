@@ -89,7 +89,7 @@ else:
     raise ImportError("Tensorflow version must be 2.1.0 or 2.0.0")
 
 with tf.device('/CPU:0'):
-    common_path = os.path.join('logs', options.model_name, time.time())
+    common_path = os.path.join('logs', options.model_name, str(time.time()))
     if not os.path.exists(common_path):
         os.makedirs(common_path)
 
@@ -180,7 +180,7 @@ with tf.device('/CPU:0'):
             save_best_only=True,
             period=5
         ),
-        Tensorboard(
+        TensorBoard(
             common_path
         )
     ]
@@ -200,6 +200,13 @@ with tf.device('/CPU:0'):
         optimizer=optimizer,
         metrics=['accuracy']
     )
+
+    try:
+        model.load_weights(C.input_weight_path)
+        print('Weights loaded from {}'.format(C.input_weight_path))
+    except:
+        print('Not possible to load weights from {}'.format(C.input_weight_path))
+        pass
 
 # if GPU is available, train on GPU
 with tf.device(device):
