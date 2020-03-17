@@ -91,6 +91,8 @@ else:
 
 with tf.device('/CPU:0'):
     common_path = os.path.join('logs', options.model_name, time.time())
+    if not os.path.exists(common_path):
+        os.makedirs(common_path)
 
     C = Config()
     C.model_name = options.model_name
