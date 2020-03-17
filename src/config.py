@@ -21,6 +21,8 @@ class Config:
 
         self.base_net_weights = None
 
+        self.common_path = None
+
 class Struct:
 
     def __init__(self, **entries):

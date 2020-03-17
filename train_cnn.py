@@ -97,6 +97,7 @@ with tf.device('/CPU:0'):
     C.use_horizontal_flips = bool(options.horizontal_flips)
     C.use_vertical_flips = bool(options.vertical_flips)
     C.rot_90 = bool(options.rot_90)
+    C.common_path = common_path
 
     if options.network == 'vgg16':
         from src.architectures import vgg16 as nn
