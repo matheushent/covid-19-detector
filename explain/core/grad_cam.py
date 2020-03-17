@@ -6,8 +6,8 @@ import tensorflow as tf
 import numpy as np
 import cv2
 
-from tf_explain.utils.display import grid_display, heatmap_display
-from tf_explain.utils.saver import save_rgb
+from explain.utils.display import grid_display, heatmap_display
+from explain.utils.saver import save_rgb
 
 
 class GradCAM:
