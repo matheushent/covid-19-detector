@@ -18,7 +18,7 @@ import os
 import tensorflow as tf
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.callbacks import Tensorboard, ModelCheckpoint
+from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 from tensorflow.keras.utils import generic_utils, plot_model
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 from tensorflow.keras.utils import to_categorical
