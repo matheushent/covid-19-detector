@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from imutils import paths
 import pandas as pd
 import numpy as np
+import pickle
 import random
 import pprint
 import json
@@ -20,8 +21,11 @@ import tensorflow as tf
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
+from tensorflow.keras.layers import Flatten, Dense, Dropout, \
+                                    AveragePooling2D
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.applications import VGG16
 from tensorflow.keras.layers import Input
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
@@ -122,14 +126,14 @@ with tf.device('/CPU:0'):
     if not options.config_filename.endswith('.txt'):
         C.config_filename = options.config_filename + '.txt'
 
-    config_output_filename = os.path.join(common_path, C.config_filename)
+    config_output_filename = os.path.join(common_path, options.config_filename)
     with open(config_output_filename, 'w') as config_f:
         json.dump(C.__dict__, config_f)
         print('Config has been written to {}, and can be loaded when testing to ensure correct results'.format(config_output_filename))
 
     # training params
     batch_size = 8
-    learning_reate = 1e-3
+    learning_rate = 1e-3
 
     print("Loading images...")
     imagePaths = list(paths.list_images(options.path))
@@ -138,15 +142,16 @@ with tf.device('/CPU:0'):
 
     for imagePath in imagePaths:
     	# extract the class label from the filename
-    	label = imagePath.split(os.path.sep)[-2]
+        label = imagePath.split(os.path.sep)[-2]
 
-    	image = cv2.imread(imagePath)
-    	image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.imread(imagePath)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(image, (224, 224))
 
-    	data.append(image)
-    	labels.append(label)
+        data.append(image)
+        labels.append(label)
 
-    data = np.array(data) / 255.0
+    data = np.stack(data, axis=0) / 255.0
     labels = np.array(labels)
 
     print('Dumping encoder into pickle file...')
@@ -187,15 +192,33 @@ with tf.device('/CPU:0'):
     ]
 
     # as backend is tf
-    input_shape_img = (None, None, 3)
+    input_shape_img = (224, 224, 3)
 
     img_input = Input(shape=input_shape_img)
 
-    classifier = nn.nn_base(img_input, trainable=True)
-    model = Model(inputs=img_input, outputs=classifier)
+    # base_layers = nn.nn_base(img_input, trainable=False)
+    # Tensorflow 2.1 has a bug that raises a ValueError due to
+    # last dimension issues. So we'll simply use the VGG16
+    # application from keras as our base layers
+    base_layers = VGG16(weights='imagenet', include_top=False,
+                        input_tensor=img_input)
+
+    classifier = base_layers.output
+    classifier = AveragePooling2D(pool_size=(4, 4))(classifier)
+    classifier = Flatten(name='flatten')(classifier)
+    classifier = Dense(4096, activation='relu', name='fc1')(classifier)
+    classifier = Dropout(0.5)(classifier)
+    classifier = Dense(4096, activation='relu', name='fc2')(classifier)
+    classifier = Dropout(0.5)(classifier)
+    classifier = Dense(2, activation='softmax', kernel_initializer='zero', name='dense_class_2')(classifier)
+
+    model = Model(inputs=base_layers.input, outputs=classifier)
+
+    for layer in base_layers.layers:
+        layer.trainable = False
 
     print('Compiling model...')
-    optimizer = Adam(learning_reate=learning_reate)
+    optimizer = Adam(learning_rate=learning_rate)
     model.compile(
         loss='binary_crossentropy',
         optimizer=optimizer,
@@ -220,7 +243,6 @@ with tf.device(device):
         epochs=options.epochs,
         callbacks=callbacks
     )
-
     print('Saving model in {}'.format(model_path))
     model.save(model_path)
 
