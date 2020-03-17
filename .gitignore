@@ -1,3 +1,4 @@
 .vscode/
 *.ypnb_checkpoints
 *.hdf5
+*__pycache__/
