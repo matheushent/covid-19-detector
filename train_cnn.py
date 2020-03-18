@@ -31,7 +31,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import classification_report, \
                             confusion_matrix
 
@@ -154,12 +154,12 @@ with tf.device('/CPU:0'):
     data = np.stack(data, axis=0) / 255.0
     labels = np.array(labels)
 
-    print('Dumping encoder into pickle file...')
-    encoder = LabelEncoder()
-    encoder.fit(labels)
-    with open(os.path.join(common_path, 'label_encoder.pickle'), 'wb') as f:
-        pickle.dump(encoder, f)
-    labels = encoder.transform(labels)
+    print('Dumping binarizer into pickle file...')
+    binarizer = LabelBinarizer()
+    binarizer.fit(labels)
+    with open(os.path.join(common_path, 'label_binarizer.pickle'), 'wb') as f:
+        pickle.dump(binarizer, f)
+    labels = binarizer.transform(labels)
     labels = to_categorical(labels)
 
     print('Splitting')
@@ -200,6 +200,7 @@ with tf.device('/CPU:0'):
     # Tensorflow 2.1 has a bug that raises a ValueError due to
     # last dimension issues. So we'll simply use the VGG16
     # application from keras as our base layers
+    """
     base_layers = VGG16(weights='imagenet', include_top=False,
                         input_tensor=img_input)
 
@@ -211,11 +212,14 @@ with tf.device('/CPU:0'):
     classifier = Dense(4096, activation='relu', name='fc2')(classifier)
     classifier = Dropout(0.5)(classifier)
     classifier = Dense(2, activation='softmax', kernel_initializer='zero', name='dense_class_2')(classifier)
+    """
+    base_layers = nn.nn_base(img_input)
+    classifier = nn.classifier(base_layers, trainable=True)
 
-    model = Model(inputs=base_layers.input, outputs=classifier)
+    model = Model(inputs=img_input, outputs=classifier)
 
-    for layer in base_layers.layers:
-        layer.trainable = False
+    #for layer in base_layers.layers:
+    #    layer.trainable = False
 
     print('Compiling model...')
     optimizer = Adam(learning_rate=learning_rate)
@@ -224,12 +228,13 @@ with tf.device('/CPU:0'):
         optimizer=optimizer,
         metrics=['accuracy']
     )
-
+    model.summary()
+    
     try:
-        model.load_weights(C.input_weight_path)
-        print('Weights loaded from {}'.format(C.input_weight_path))
+        model.load_weights(C.base_net_weights)
+        print('Weights loaded from {}'.format(C.base_net_weights))
     except:
-        print('Not possible to load weights from {}'.format(C.input_weight_path))
+        print('Not possible to load weights from {}'.format(C.base_net_weights))
         pass
 
 # if GPU is available, train on GPU
@@ -240,7 +245,7 @@ with tf.device(device):
         steps_per_epoch=(len(x_train) // batch_size),
         validation_data=(x_test, y_test),
         validation_steps=(len(x_test) // batch_size),
-        epochs=options.epochs,
+        epochs=options.num_epochs,
         callbacks=callbacks
     )
     print('Saving model in {}'.format(model_path))
