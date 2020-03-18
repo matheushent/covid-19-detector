@@ -192,7 +192,7 @@ with tf.device('/CPU:0'):
         ),
         EarlyStopping(
             monitor='val_loss',
-            patience=4,
+            patience=8,
             verbose=1
         )
     ]
@@ -202,23 +202,6 @@ with tf.device('/CPU:0'):
 
     img_input = Input(shape=input_shape_img)
 
-    # base_layers = nn.nn_base(img_input, trainable=False)
-    # Tensorflow 2.1 has a bug that raises a ValueError due to
-    # last dimension issues. So we'll simply use the VGG16
-    # application from keras as our base layers
-    """
-    base_layers = VGG16(weights='imagenet', include_top=False,
-                        input_tensor=img_input)
-
-    classifier = base_layers.output
-    classifier = AveragePooling2D(pool_size=(4, 4))(classifier)
-    classifier = Flatten(name='flatten')(classifier)
-    classifier = Dense(4096, activation='relu', name='fc1')(classifier)
-    classifier = Dropout(0.5)(classifier)
-    classifier = Dense(4096, activation='relu', name='fc2')(classifier)
-    classifier = Dropout(0.5)(classifier)
-    classifier = Dense(2, activation='softmax', kernel_initializer='zero', name='dense_class_2')(classifier)
-    """
     base_layers = nn.nn_base(img_input)
     classifier = nn.classifier(base_layers, trainable=True)
 
@@ -239,7 +222,8 @@ with tf.device('/CPU:0'):
     try:
         model.load_weights(C.base_net_weights)
         print('Weights loaded from {}'.format(C.base_net_weights))
-    except:
+    except Exception as e:
+        print(e)
         print('Not possible to load weights from {}'.format(C.base_net_weights))
         pass
 
@@ -264,7 +248,7 @@ with tf.device(device):
 
     report = classification_report(
         y_test.argmax(axis=1), preds,
-        target_names=encoder.classes_,
+        target_names=binarizer.classes_,
         output_dict=True
     )
     print()
@@ -289,7 +273,7 @@ with tf.device('/CPU:0'):
     print("specificity: {:.4f}".format(specificity))
 
     # plot the training loss and accuracy
-    k = options.num_epochs
+    k = len(history.history["loss"])
     plt.style.use("ggplot")
     plt.figure()
     plt.plot(np.arange(0, k), history.history["loss"], label="train_loss")
