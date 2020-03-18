@@ -19,8 +19,9 @@ import os
 
 import tensorflow as tf
 
+from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint, \
+                                       EarlyStopping
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 from tensorflow.keras.layers import Flatten, Dense, Dropout, \
                                     AveragePooling2D
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
@@ -188,6 +189,11 @@ with tf.device('/CPU:0'):
         ),
         TensorBoard(
             common_path
+        ),
+        EarlyStopping(
+            monitor='val_loss',
+            patience=4,
+            verbose=1
         )
     ]
 
@@ -245,6 +251,7 @@ with tf.device(device):
         steps_per_epoch=(len(x_train) // batch_size),
         validation_data=(x_test, y_test),
         validation_steps=(len(x_test) // batch_size),
+        verbose=1,
         epochs=options.num_epochs,
         callbacks=callbacks
     )
