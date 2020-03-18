@@ -39,9 +39,9 @@ Set the following options to run the vis script:
 
 To run the server just enter the following line on cmd:
 
-```python server.py -m path/to/model_file```
+```python server.py -m path/to/model/weights/file```
 
-The -m argument is the same one as in pattern visualization. Just indicate the path to the model saved after training.
+The weights file were generated after training
 
 After, to make an http request run request.py:
 
