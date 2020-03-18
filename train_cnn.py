@@ -43,7 +43,7 @@ sys.setrecursionlimit(40000)
 parser = OptionParser()
 
 parser.add_option("-p", dest="path", help="Path to training data.")
-parser.add_option("-g", dest="gpu_option", help="If use or not gpu in case it is possible. (Default = False)", action="store_false", default=True)
+parser.add_option("-g", dest="gpu_option", help="If use or not gpu in case it is possible. (Default = True)", action="store_false", default=True)
 parser.add_option("--network", dest="network", help="Base network to use. Supports vgg16, vgg19, resnet50 and resnet152", default='resnet50')
 parser.add_option("--hf", dest="horizontal_flips", help="Augment with horizontal flips in training. (Default=True).", action="store_false", default=True)
 parser.add_option("--vf", dest="vertical_flips", help="Augment with vertical flips in training. (Default=True).", action="store_false", default=True)
@@ -192,7 +192,7 @@ with tf.device('/CPU:0'):
         ),
         EarlyStopping(
             monitor='val_loss',
-            patience=8,
+            patience=5,
             verbose=1
         )
     ]
@@ -241,6 +241,7 @@ with tf.device(device):
     )
     print('Saving model in {}'.format(model_path))
     model.save(model_path)
+    model.save_weights(os.path.join(common_path, 'model_weights.h5'))
 
     print('Evaluating the model...')
     preds = model.predict(x_test, batch_size=batch_size)
