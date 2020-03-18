@@ -226,4 +226,4 @@ def nn_base(input_tensor=None, trainable=False):
     for i in range(1, 36):
         x = identity_block(x, 3, [128, 128, 512], stage=4, block='b' + str(i), trainable=trainable)
 
-    return classifier(x, trainable=True)
+    return x

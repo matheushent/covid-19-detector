@@ -163,7 +163,7 @@ def classifier_layers(x, input_shape, trainable=False):
 
     x = identity_block_td(x, 3, [512, 512, 2048], stage=5, block='b', trainable=trainable)
     x = identity_block_td(x, 3, [512, 512, 2048], stage=5, block='c', trainable=trainable)
-    x = TimeDistributed(AveragePooling2D((7, 7)), name='avg_pool')(x)
+    x = AveragePooling2D((7, 7), name='avg_pool')(x)
 
     return x
 
@@ -172,9 +172,9 @@ def classifier(base_layers, nb_classes=2, trainable=False):
 
     out = classifier_layers(base_layers, input_shape=input_shape, trainable=True)
 
-    out = TimeDistributed(Flatten())(out)
+    out = Flatten()(out)
 
-    out_class = TimeDistributed(Dense(nb_classes, activation='softmax', kernel_initializer='zero'), name='dense_class_{}'.format(nb_classes))(out)
+    out_class = Dense(nb_classes, activation='softmax', kernel_initializer='zero', name='dense_class_{}'.format(nb_classes))(out)
     return out_class
 
 def nn_base(input_tensor=None, trainable=False):
@@ -215,4 +215,4 @@ def nn_base(input_tensor=None, trainable=False):
     x = identity_block(x, 3, [256, 256, 1024], stage=4, block='e', trainable=trainable)
     x = identity_block(x, 3, [256, 256, 1024], stage=4, block='f', trainable=trainable)
 
-    return classifier(x,trainable=True)
+    return x
