@@ -40,14 +40,14 @@ def conv_block(units, conv_name, bn_name, activation='relu',
 
 def classifier(base_layers, nb_classes=2, trainable=False):
 
-    out = TimeDistributed(Flatten(name='flatten'))(base_layers)
-    out = TimeDistributed(Dense(4096, activation='relu', name='fc1'))(out)
-    out = TimeDistributed(Dropout(0.5))(out)
-    out = TimeDistributed(Dense(4096, activation='relu', name='fc2'))(out)
-    out = TimeDistributed(Dropout(0.5))(out)
+    out = Flatten(name='flatten')(base_layers)
+    out = Dense(4096, activation='relu', name='fc1')(out)
+    out = Dropout(0.5)(out)
+    out = Dense(4096, activation='relu', name='fc2')(out)
+    out = Dropout(0.5)(out)
 
-    out_class = TimeDistributed(Dense(nb_classes, activation='softmax', kernel_initializer='zero'),
-                                    name='dense_class_{}'.format(nb_classes))(out)
+    out_class = Dense(nb_classes, activation='softmax', kernel_initializer='zero',
+                      name='dense_class_{}'.format(nb_classes))(out)
     
     return out_class
 
