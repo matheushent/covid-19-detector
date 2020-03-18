@@ -1,4 +1,10 @@
-"# covid-19-detector" 
+"# covid-19-detector"
+
+## Pre-requisites
+
+We assume you have an GPU available and python 3.6+ installed. Make sure you have installed all the correct drivers for gpu training. Check out ```https://www.tensorflow.org/install/gpu``` for information about GPU setup.
+
+Assuming you're ok, run ```pip install -r requirements.txt``` to install all necessary packages.
 
 ## Training
 
@@ -16,6 +22,10 @@ Set the following options to train:
 * ```--input_weight_path```: Input path for weights for classifier model
 * ```--mn```: Name of the model
 
+Example of training command line:
+
+```python train_cnn.py -p dataset/ -g True --network vgg19 --mn vgg19_1```
+
 ## Pattern Visualization
 
 Set the following options to run the vis script:
@@ -24,6 +34,18 @@ Set the following options to run the vis script:
 * ```-m```: Path to the model file (hdf5)
 * ```-c```: Path to the config file
 * ```-g```: Use GPU or not (Default = True)
+
+## Server
+
+To run the server just enter the following line on cmd:
+
+```python server.py -m path/to/model_file```
+
+The -m argument is the same one as in pattern visualization. Just indicate the path to the model saved after training.
+
+After, to make an http request run request.py:
+
+```python request.py -p path/to/folder/containing/images/to/be/classified```
 
 ## Credits
 
