@@ -173,6 +173,7 @@ def decode_predictions(preds):
 @app.route("/predict", methods=["POST"])
 def predict():
     global device
+    global model
 	# initialize the data dictionary that will be returned from the
 	# view
     data = {"success": False}
