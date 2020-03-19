@@ -126,16 +126,13 @@ def load_model(path, config):
     Args:
         path: Path to the model weights
         config: Path to the config file generated during training
-    Returns:
-        Compiled model ready for predicting
     """
     global model
     model = get_nn(config)
 
     print('Loading weights from {}'.format(path))
     model.load_weights(path)
-
-    return model
+    model.compile(optimizer='sgd', loss='binary_crossentropy')
 
 def load_binarizer(path):
     global binarizer
