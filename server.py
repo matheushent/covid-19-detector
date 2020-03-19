@@ -1,5 +1,5 @@
 """
-Code based on Adrian's repo (https://github.com/jrosebr1/simple-keras-rest-api)
+Code based on https://blog.keras.io/building-a-simple-keras-deep-learning-rest-api.html
 """
 
 # USAGE
