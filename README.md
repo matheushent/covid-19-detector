@@ -26,6 +26,17 @@ Example of training command line:
 
 ```python train_cnn.py -p dataset/ -g True --network vgg19 --mn vgg19_1```
 
+# Predicting
+
+Set the following options to predict:
+
+* ```-w```: Path to the weights file (hdf5 or h5)
+* ```-c```: Path to the config file
+* ```-p```: Path to the folder containing images to be classified
+* ```-g```: Use GPU or not (Default = True)
+
+![Alt text](./predicted/1-s2.0-S0140673620303706-fx1_lrg.jpg)
+
 # Pattern Visualization
 
 Set the following options to run the vis script:
