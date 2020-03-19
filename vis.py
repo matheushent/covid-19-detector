@@ -7,6 +7,10 @@ import os
 from explain.core.occlusion_sensitivity import OcclusionSensitivity
 from explain.core.grad_cam import GradCAM
 
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input
+
 from src.config import Struct
 
 import tensorflow as tf
@@ -14,7 +18,7 @@ import tensorflow as tf
 parser = OptionParser()
 
 parser.add_option("-p", dest="path", help="Path to the image.")
-parser.add_option("-m", dest="model_path", help="Path to the model file (hdf5).")
+parser.add_option("-w", dest="weights", help="Path to the weights file (hdf5 or h5).")
 parser.add_option("-c", dest="config", help="Path to the config file.")
 parser.add_option("-g", dest="gpu", help="Use GPU or not.", action="store_false", default=True)
 (options, args) = parser.parse_args()
@@ -22,8 +26,8 @@ parser.add_option("-g", dest="gpu", help="Use GPU or not.", action="store_false"
 if not options.path:
     parser.error("Pass -p argument")
 
-if not options.model_path:
-    parser.error("Pass -m argument")
+if not options.weights:
+    parser.error("Pass -w argument")
 
 if not options.config:
     parser.error("Pass -c argument")
@@ -75,8 +79,25 @@ elif C.network == 'resnet152':
     from src.architectures import resnet152 as nn
 
 with tf.device(device):
-    print('Loading model from {}'.format(options.model_path))
-    model = tf.keras.models.load_model(options.model_path)
+    print('Loading weights from {}'.format(options.weights))
+    # Create our model, load weights and then
+    # compile it
+    input_shape_img = (224, 224, 3)
+
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(img_input)
+    classifier = nn.classifier(base_layers, trainable=False)
+
+    optimizer = Adam(learning_rate=0.001)
+
+    model =  Model(inputs=img_input, outputs=classifier)
+    model.load_weights(options.weights)
+    model.compile(
+        loss='binary_crossentropy',
+        optimizer=optimizer,
+        metrics=['accuracy']
+    )
 
 with tf.device('/CPU:0'):
     print('Loading image...')
@@ -97,7 +118,7 @@ with tf.device(device):
     explainer = OcclusionSensitivity()
     # Compute OcclusionSensitivity
     print('Computing occlusion sensitivity')
-    arrays = [explainer.explain(data, model, class_index=i, _grid=False)[0] for i in range(2)]
+    arrays = [explainer.explain(data, model, class_index=i, _grid=False, patch_size=15)[0] for i in range(2)]
     for i, array in enumerate(arrays):
         explainer.save(array, C.common_path, 'occlusion_sensitivity_class_{}.png'.format(i))
 
