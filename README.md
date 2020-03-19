@@ -31,9 +31,17 @@ Example of training command line:
 Set the following options to run the vis script:
 
 * ```-p```: Path to the image
-* ```-m```: Path to the model file (hdf5)
+* ```-w```: Path to the weights file (hdf5 or h5)
 * ```-c```: Path to the config file
 * ```-g```: Use GPU or not (Default = True)
+
+# Grad-CAM
+
+![Alt text](./logs/vgg19_3/1584569553.9135659/grad_cam_class_0.png)
+
+# Occlusion Sensitivity
+
+![Alt text](./logs/vgg19_3/1584569553.9135659/occlusion_sensitivity_class_0.png)
 
 ## Server
 
