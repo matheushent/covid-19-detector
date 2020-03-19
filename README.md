@@ -1,12 +1,12 @@
 "# covid-19-detector"
 
-## Pre-requisites
+# Pre-requisites
 
 We assume you have an GPU available and python 3.6+ installed. Make sure you have installed all the correct drivers for gpu training. Check out ```https://www.tensorflow.org/install/gpu``` for information about GPU setup.
 
 Assuming you're ok, run ```pip install -r requirements.txt``` to install all necessary packages.
 
-## Training
+# Training
 
 Set the following options to train:
 
@@ -26,7 +26,7 @@ Example of training command line:
 
 ```python train_cnn.py -p dataset/ -g True --network vgg19 --mn vgg19_1```
 
-## Pattern Visualization
+# Pattern Visualization
 
 Set the following options to run the vis script:
 
@@ -35,15 +35,15 @@ Set the following options to run the vis script:
 * ```-c```: Path to the config file
 * ```-g```: Use GPU or not (Default = True)
 
-# Grad-CAM
+## Grad-CAM
 
 ![Alt text](./logs/vgg19_3/1584569553.9135659/grad_cam_class_0.png)
 
-# Occlusion Sensitivity
+## Occlusion Sensitivity
 
 ![Alt text](./logs/vgg19_3/1584569553.9135659/occlusion_sensitivity_class_0.png)
 
-## Server
+# Server
 
 To run the server just enter the following line on cmd:
 
@@ -55,7 +55,7 @@ After, to make an http request run request.py:
 
 ```python request.py -p path/to/folder/containing/images/to/be/classified```
 
-## Credits
+# Credits
 
 * Many thanks to Joseph Paul Cohen who makes the dataset available on https://github.com/ieee8023/covid-chestxray-dataset
 * Many thanks to Adrian Rosebrock for providing some interesting code (https://github.com/jrosebr1)
