@@ -185,7 +185,7 @@ with tf.device('/CPU:0'):
             monitor='val_loss',
             verbose=1,
             save_best_only=True,
-            period=5
+            period=3
         ),
         TensorBoard(
             common_path
@@ -193,7 +193,8 @@ with tf.device('/CPU:0'):
         EarlyStopping(
             monitor='val_loss',
             patience=5,
-            verbose=1
+            verbose=1,
+            restore_best_weights=True
         )
     ]
 
@@ -239,8 +240,7 @@ with tf.device(device):
         epochs=options.num_epochs,
         callbacks=callbacks
     )
-    print('Saving model in {}'.format(model_path))
-    model.save(model_path)
+    print('Saving weights in {}'.format(os.path.join(common_path, 'model_weights.h5'))
     model.save_weights(os.path.join(common_path, 'model_weights.h5'))
 
     print('Evaluating the model...')
