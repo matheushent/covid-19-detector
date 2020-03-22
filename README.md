@@ -78,7 +78,7 @@ All the models were run on a GPU RTX 2080 6GB. Each epoch took ~50s
 
 # Credits
 
-* Many thank to **Società Italiana di Radiologia Medica e Interventistica** for providing many images on https://www.sirm.org/category/senza-categoria/covid-19/
+* Many thank to [Società Italiana di Radiologia Medica e Interventistica](https://www.sirm.org/category/senza-categoria/covid-19/) for providing many images on 
 * Many thanks to https://www.medicalimages.com for providing some CT images of normal lungs
-* Many thanks to **Joseph Paul Cohen** who makes part of the dataset available on https://github.com/ieee8023/covid-chestxray-dataset
-* Many thanks to Adrian **Rosebrock** for providing some interesting code (https://github.com/jrosebr1)
+* Many thanks to [Joseph Paul Cohen](https://github.com/ieee8023/covid-chestxray-dataset) who makes part of the dataset available
+* Many thanks to [Adrian Rosebrock](https://github.com/jrosebr1) for providing some interesting code
