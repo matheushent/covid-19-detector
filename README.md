@@ -70,7 +70,15 @@ After, to make an http request run request.py:
 
 ```python request.py -p path/to/folder/containing/images/to/be/classified```
 
+# Results
+
+All the models were run on a GPU RTX 2080 6GB. Each epoch took ~48s
+
+* **VGG19**: ~70% accuracy after 15 epochs
+
 # Credits
 
-* Many thanks to Joseph Paul Cohen who makes the dataset available on https://github.com/ieee8023/covid-chestxray-dataset
-* Many thanks to Adrian Rosebrock for providing some interesting code (https://github.com/jrosebr1)
+* Many thank to **Società Italiana di Radiologia Medica e Interventistica** for providing many images on https://www.sirm.org/category/senza-categoria/covid-19/
+* Many thanks to https://www.medicalimages.com for providing some CT images of normal lungs
+* Many thanks to **Joseph Paul Cohen** who makes part of the dataset available on https://github.com/ieee8023/covid-chestxray-dataset
+* Many thanks to Adrian **Rosebrock** for providing some interesting code (https://github.com/jrosebr1)
