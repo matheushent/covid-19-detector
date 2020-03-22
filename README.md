@@ -1,5 +1,9 @@
 "# covid-19-detector"
 
+# ATTENTION
+
+**Do NOT use any result of this repo for scientific purposes without medical assistance**
+
 # Pre-requisites
 
 We assume you have an GPU available and python 3.6+ installed. Make sure you have installed all the correct drivers for gpu training. Check out ```https://www.tensorflow.org/install/gpu``` for information about GPU setup.
