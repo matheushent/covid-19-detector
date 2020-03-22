@@ -1,0 +1,1 @@
+{"verbose": true, "network": "vgg19", "use_horizontal_flips": true, "use_vertical_flips": true, "rot_90": true, "model_path": null, "model_name": "vgg19_master_1", "config_filename": null, "base_net_weights": "logs/vgg19_3/1584569553.9135659/model_weights.h5", "common_path": "logs/vgg19_master_1/1584855883.9026732"}
