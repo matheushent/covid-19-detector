@@ -19,6 +19,7 @@ import os
 
 import tensorflow as tf
 
+from tensorflow.keras.applications import VGG16, VGG19, ResNet152, ResNet50
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint, \
                                        EarlyStopping
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -26,7 +27,6 @@ from tensorflow.keras.layers import Flatten, Dense, Dropout, \
                                     AveragePooling2D
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.applications import VGG16
 from tensorflow.keras.layers import Input
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
@@ -62,6 +62,10 @@ if not options.model_name:
     parser.error("Pass --mn argument")
 if not options.path:
     parser.error("Pass -p argument")
+
+# define input of our network
+input_shape_img = (224, 224, 3)
+img_input = Input(shape=input_shape_img)
 
 if tf.__version__ == '2.1.0':
     physical_devices = tf.config.list_physical_devices('GPU')
@@ -106,17 +110,22 @@ with tf.device('/CPU:0'):
     C.rot_90 = bool(options.rot_90)
     C.common_path = common_path
 
+    print('Loading pre-trained weights...')
     if options.network == 'vgg16':
         from src.architectures import vgg16 as nn
+        base_layers = VGG16(weights='imagenet', include_top=False, input_tensor=img_input)
         C.network = 'vgg16'
     elif options.network == 'vgg19':
         from src.architectures import vgg19 as nn
+        base_layers = VGG19(weights='imagenet', include_top=False, input_tensor=img_input)
         C.network = 'vgg19'
     elif options.network == 'resnet50':
         from src.architectures import resnet50 as nn
+        base_layers = ResNet50(weights='imagenet', include_top=False, input_tensor=img_input)
         C.network = 'resnet50'
     elif options.network == 'resnet152':
         from src.architectures import resnet152 as nn
+        base_layers = ResNet152(weights='imagenet', include_top=False, input_tensor=img_input)
         C.network = 'resnet152'
     else:
         raise ValueError("Not a valid model was passed")
@@ -165,7 +174,7 @@ with tf.device('/CPU:0'):
 
     print('Splitting')
     x_train, x_test, y_train, y_test = train_test_split(data, labels,
-                                                        test_size=0.20,
+                                                        test_size=0.30,
                                                         stratify=labels,
                                                         random_state=24)
 
@@ -198,18 +207,12 @@ with tf.device('/CPU:0'):
         )
     ]
 
-    # as backend is tf
-    input_shape_img = (224, 224, 3)
+    classifier = nn.classifier(base_layers.output, trainable=True)
 
-    img_input = Input(shape=input_shape_img)
+    model = Model(inputs=base_layers.input, outputs=classifier)
 
-    base_layers = nn.nn_base(img_input)
-    classifier = nn.classifier(base_layers, trainable=True)
-
-    model = Model(inputs=img_input, outputs=classifier)
-
-    #for layer in base_layers.layers:
-    #    layer.trainable = False
+    for layer in base_layers.layers:
+        layer.trainable = False
 
     print('Compiling model...')
     optimizer = Adam(learning_rate=learning_rate)
@@ -240,7 +243,7 @@ with tf.device(device):
         epochs=options.num_epochs,
         callbacks=callbacks
     )
-    print('Saving weights in {}'.format(os.path.join(common_path, 'model_weights.h5'))
+    print('Saving weights in {}'.format(os.path.join(common_path, 'model_weights.h5')))
     model.save_weights(os.path.join(common_path, 'model_weights.h5'))
 
     print('Evaluating the model...')
