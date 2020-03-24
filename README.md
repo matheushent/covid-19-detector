@@ -72,9 +72,9 @@ After, to make an http request run request.py:
 
 # Results
 
-All the models were run on a GPU RTX 2080 6GB. Each epoch took ~50s
+All the models were run on a GPU RTX 2080 6GB. Each epoch took ~22s
 
-* **VGG19**: ~73% accuracy after 10 epochs
+* **VGG19**: ~96% accuracy and ~90% val accuracy after 29 epochs
 
 # Credits
 
