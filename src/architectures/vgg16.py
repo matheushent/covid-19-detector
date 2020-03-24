@@ -45,6 +45,14 @@ def classifier(base_layers, nb_classes=2, trainable=False):
     out = Dropout(0.5)(out)
     out = Dense(4096, activation='relu', name='fc2')(out)
     out = Dropout(0.5)(out)
+    out = Dense(8192, activation='relu', name='fc3')(out)
+    out = Dropout(0.5)(out)
+    out = Dense(8192, activation='relu', name='fc4')(out)
+    out = Dropout(0.5)(out)
+    out = Dense(8192, activation='relu', name='fc5')(out)
+    out = Dropout(0.5)(out)
+    out = Dense(16384, activation='relu', name='fc6')(out)
+    out = Dropout(0.3)(out)
 
     out_class = Dense(nb_classes, activation='softmax', kernel_initializer='zero',
                       name='dense_class_{}'.format(nb_classes))(out)
