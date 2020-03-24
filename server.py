@@ -30,35 +30,47 @@ binarizer = None
 device = None
 model = None
 
-def check_gpu_availability():
-    global device
+parser = OptionParser()
 
-    if tf.__version__ == '2.1.0':
-        physical_devices = tf.config.list_physical_devices('GPU')
+parser.add_option("-m", dest="model", help="Path to model weights file (hdf5 or h5)")
+parser.add_option("-c", dest="config", help="Path to the config file.")
 
-        if len(physical_devices) > 0:
-            device = '/GPU:0'
-            try: 
-                tf.config.experimental.set_memory_growth(physical_devices[0], True) 
-            except: 
-                # Invalid device or cannot modify virtual devices once initialized.
-                # Probably an error will raise
-                pass
-        else:
-            device = '/CPU:0'
-    elif tf.__version__ == '2.0.0':
-        physical_devices = tf.config.experimental.list_physical_devices('GPU')
+(options, args) = parser.parse_args()
 
-        if len(physical_devices) > 0:
-            device = '/GPU:0'
-            try: 
-                tf.config.experimental.set_memory_growth(physical_devices[0], True) 
-            except: 
-                # Invalid device or cannot modify virtual devices once initialized.
-                # Probably an error will raise
-                pass
-        else:
-            device = '/CPU:0'
+if not options.model:
+    parser.error("Pass -m argument")
+if not options.config:
+    parser.error("Pass -c argument")
+
+if tf.__version__ == '2.1.0':
+    physical_devices = tf.config.list_physical_devices('GPU')
+
+    if len(physical_devices) > 0:
+        device = '/GPU:0'
+        try: 
+            tf.config.experimental.set_memory_growth(physical_devices[0], True) 
+        except: 
+            # Invalid device or cannot modify virtual devices once initialized.
+            # Probably an error will raise
+            pass
+    else:
+        device = '/CPU:0'
+elif tf.__version__ == '2.0.0':
+    physical_devices = tf.config.experimental.list_physical_devices('GPU')
+
+    if len(physical_devices) > 0:
+        device = '/GPU:0'
+        try: 
+            tf.config.experimental.set_memory_growth(physical_devices[0], True) 
+        except: 
+            # Invalid device or cannot modify virtual devices once initialized.
+            # Probably an error will raise
+            pass
+    else:
+        device = '/CPU:0'
+
+with open(options.config, 'rb') as f:
+    binarizer = pickle.load(f)
 
 def get_nn(config):
     """
@@ -109,10 +121,9 @@ def load_model(path, config):
     model.load_weights(path)
     model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
 
-def load_binarizer(path):
-    global binarizer
-    with open(path, 'rb') as f:
-        binarizer = pickle.load(f)
+print("* Loading Keras model and Flask starting server...")
+print("Please wait until server has fully started")
+load_model(options.model, options.config)
 
 def prepare_image(image, target):
     """
@@ -182,22 +193,6 @@ def predict():
     return flask.jsonify(data)
 
 # if this is the main thread of execution first load the model and
-# then start the server
-if __name__ == "__main__":
-    parser = OptionParser()
-
-    parser.add_option("-m", dest="model", help="Path to model weights file (hdf5 or h5)")
-    parser.add_option("-c", dest="config", help="Path to the config file.")
-
-    (options, args) = parser.parse_args()
-
-    if not options.model:
-        parser.error("Pass -m argument")
-    if not options.config:
-        parser.error("Pass -c argument")
-
-    print("* Loading Keras model and Flask starting server...")
-    print("Please wait until server has fully started")
-    load_model(options.model, options.config)
-    print('Server running')
-    app.run()
+# then start the server    
+print('Server running')
+app.run()
