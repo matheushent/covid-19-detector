@@ -143,7 +143,7 @@ with tf.device('/CPU:0'):
 
     # training params
     batch_size = 8
-    learning_rate = 1e-3
+    learning_rate = 1e-4
 
     print("Loading images...")
     imagePaths = list(paths.list_images(options.path))
