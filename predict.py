@@ -1,3 +1,5 @@
+from tensorflow.keras.applications import ResNet152, ResNet50, \
+                                          VGG16, VGG19
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input
@@ -69,29 +71,32 @@ with open(options.config, 'rb') as f:
 # Construct an object
 C = Struct(**C)
 
+input_shape_img = (224, 224, 3)
+
+img_input = Input(shape=input_shape_img)
+
+print('Loading pre-trained weights...')
 if C.network == 'vgg16':
     from src.architectures import vgg16 as nn
+    base_layers = VGG16(weights=None, include_top=False, input_tensor=img_input)
 elif C.network == 'vgg19':
     from src.architectures import vgg19 as nn
+    base_layers = VGG19(weights=None, include_top=False, input_tensor=img_input)
 elif C.network == 'resnet50':
     from src.architectures import resnet50 as nn
+    base_layers = ResNet50(weights=None, include_top=False, input_tensor=img_input)
 elif C.network == 'resnet152':
     from src.architectures import resnet152 as nn
+    base_layers = ResNet152(weights=None, include_top=False, input_tensor=img_input)
 
 with tf.device(device):
+
     print('Loading weights from {}'.format(options.weights))
-    # Create our model, load weights and then
-    # compile it
-    input_shape_img = (224, 224, 3)
+    classifier = nn.classifier(base_layers.output, trainable=False)
 
-    img_input = Input(shape=input_shape_img)
+    optimizer = Adam(learning_rate=0.0001)
 
-    base_layers = nn.nn_base(img_input)
-    classifier = nn.classifier(base_layers, trainable=False)
-
-    optimizer = Adam(learning_rate=0.001)
-
-    model =  Model(inputs=img_input, outputs=classifier)
+    model =  Model(inputs=base_layers.input, outputs=classifier)
     model.load_weights(options.weights)
     model.compile(
         loss='binary_crossentropy',
