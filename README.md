@@ -16,11 +16,10 @@ Set the following options to train:
 
 * ```-p```: Path to the dataset (dataset/)
 * ```-g```: If use or not gpu in case it is possible. (Default = True)
-* ```--network```: Base network to use. Supports vgg16, vgg19, resnet50 and resnet152 (Default = resnet50)
+* ```--network```: Base network to use. Supports vgg16, vgg19, resnet50, resnet152, efficientnet-b0, efficientnet-b1,..., efficientnet-b7 (Default = resnet50)
 * ```--hf```: Augment with horizontal flips in training. (Default=True)
 * ```--vf```: Augment with vertical flips in training. (Default=True)
 * ```--rot```: Augment with 90 degree rotations in training. (Default=True)
-* ```--bn```: If use or not batch normalization. Available only for both vgg models
 * ```--num_epochs```: Number of epochs. (Default = 100)
 * ```--config_filename```: Name of txt file that stores all the metadata related to the training (to be used when testing)
 * ```--input_weight_path```: Input path for weights for classifier model
@@ -28,7 +27,7 @@ Set the following options to train:
 
 Example of training command line:
 
-```python train_cnn.py -p dataset/ -g True --network vgg19 --mn vgg19_1```
+```python train.py -p dataset/ -g True --network vgg19 --mn vgg19_1```
 
 # Predicting
 
@@ -38,8 +37,6 @@ Set the following options to predict:
 * ```-c```: Path to the config file
 * ```-p```: Path to the folder containing images to be classified
 * ```-g```: Use GPU or not (Default = True)
-
-![Alt text](./predicted/1-s2.0-S0140673620303706-fx1_lrg.jpg)
 
 # Pattern Visualization
 
