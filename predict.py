@@ -78,16 +78,128 @@ img_input = Input(shape=input_shape_img)
 print('Loading pre-trained weights...')
 if C.network == 'vgg16':
     from src.architectures import vgg16 as nn
-    base_layers = VGG16(weights=None, include_top=False, input_tensor=img_input)
+
+    # define input of our network
+    input_shape_img = (224, 224, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = VGG16(weights='imagenet', include_top=False, input_tensor=img_input)
+
 elif C.network == 'vgg19':
     from src.architectures import vgg19 as nn
-    base_layers = VGG19(weights=None, include_top=False, input_tensor=img_input)
+
+    # define input of our network
+    input_shape_img = (224, 224, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = VGG19(weights='imagenet', include_top=False, input_tensor=img_input)
+    
 elif C.network == 'resnet50':
     from src.architectures import resnet50 as nn
-    base_layers = ResNet50(weights=None, include_top=False, input_tensor=img_input)
+
+    # define input of our network
+    input_shape_img = (224, 224, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = ResNet50(weights='imagenet', include_top=False, input_tensor=img_input)
+    
 elif C.network == 'resnet152':
     from src.architectures import resnet152 as nn
-    base_layers = ResNet152(weights=None, include_top=False, input_tensor=img_input)
+
+    # define input of our network
+    input_shape_img = (224, 224, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = ResNet152(weights='imagenet', include_top=False, input_tensor=img_input)
+    
+elif C.network == 'efficientnet-b0':
+    from src.architectures import efficientnet as nn
+
+    # define input of our network
+    input_shape_img = (224, 224, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(1.0, 1.0, input_tensor=img_input, dropout_rate=0.2)
+    base_layers = Model(img_input, base_layers)
+    base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b0_noisy-student_notop.h5")
+    
+elif C.network == 'efficientnet-b1':
+    from src.architectures import efficientnet as nn
+
+    # define input of our network
+    input_shape_img = (240, 240, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(1.0, 1.1, input_tensor=img_input, dropout_rate=0.2)
+    base_layers = Model(img_input, base_layers)
+    base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b1_noisy-student_notop.h5")
+    
+elif C.network == 'efficientnet-b2':
+    from src.architectures import efficientnet as nn
+
+    # define input of our network
+    input_shape_img = (260, 260, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(1.1, 1.2, input_tensor=img_input, dropout_rate=0.3)
+    base_layers = Model(img_input, base_layers)
+    base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b2_noisy-student_notop.h5")
+    
+elif C.network == 'efficientnet-b3':
+    from src.architectures import efficientnet as nn
+
+    # define input of our network
+    input_shape_img = (300, 300, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(1.2, 1.4, input_tensor=img_input, dropout_rate=0.3)
+    base_layers = Model(img_input, base_layers)
+    base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b3_noisy-student_notop.h5")
+    
+elif C.network == 'efficientnet-b4':
+    from src.architectures import efficientnet as nn
+
+    # define input of our network
+    input_shape_img = (380, 380, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(1.4, 1.8, input_tensor=img_input, dropout_rate=0.4)
+    base_layers = Model(img_input, base_layers)
+    base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b4_noisy-student_notop.h5")
+    
+elif C.network == 'efficientnet-b5':
+    from src.architectures import efficientnet as nn
+
+    # define input of our network
+    input_shape_img = (456, 456, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(1.6, 2,2, input_tensor=img_input, dropout_rate=0.4)
+    base_layers = Model(img_input, base_layers)
+    base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b5_noisy-student_notop.h5")
+    
+elif C.network == 'efficientnet-b6':
+    from src.architectures import efficientnet as nn
+
+    # define input of our network
+    input_shape_img = (528, 528, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(1.8, 2.6, input_tensor=img_input, dropout_rate=0.5)
+    base_layers = Model(img_input, base_layers)
+    base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b6_noisy-student_notop.h5")
+    
+elif C.network == 'efficientnet-b7':
+    from src.architectures import efficientnet as nn
+
+    # define input of our network
+    input_shape_img = (600, 600, 3)
+    img_input = Input(shape=input_shape_img)
+
+    base_layers = nn.nn_base(2.0, 3.1, input_tensor=img_input, dropout_rate=0.5)
+    base_layers = Model(img_input, base_layers)
+    base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b7_noisy-student_notop.h5")
+    
 
 with tf.device(device):
 
