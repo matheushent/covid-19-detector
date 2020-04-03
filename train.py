@@ -27,8 +27,8 @@ from tensorflow.keras.layers import Flatten, Dense, Dropout, \
                                     AveragePooling2D
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.layers import Input
 from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
 from sklearn.model_selection import train_test_split
@@ -44,11 +44,10 @@ parser = OptionParser()
 
 parser.add_option("-p", dest="path", help="Path to training data.")
 parser.add_option("-g", dest="gpu_option", help="If use or not gpu in case it is possible. (Default = True)", action="store_false", default=True)
-parser.add_option("--network", dest="network", help="Base network to use. Supports vgg16, vgg19, resnet50 and resnet152", default='resnet50')
+parser.add_option("--network", dest="network", help="Base network to use. Supports vgg16, vgg19, resnet50, resnet152, efficientnet-b0, efficientnet-b1,..., efficientnet-b7", default='resnet50')
 parser.add_option("--hf", dest="horizontal_flips", help="Augment with horizontal flips in training. (Default=True).", action="store_false", default=True)
 parser.add_option("--vf", dest="vertical_flips", help="Augment with vertical flips in training. (Default=True).", action="store_false", default=True)
 parser.add_option("--rot", "--rot_90", dest="rot_90", help="Augment with 90 degree rotations in training. (Default=True).", action="store_false", default=True)
-parser.add_option("--bn", dest="batch_normalization", help="If use or not batch normalization. Available only for both vgg models", action="store_true", default=False)
 parser.add_option("--num_epochs", type="int", dest="num_epochs", help="Number of epochs.", default=100)
 parser.add_option("--config_filename", dest="config_filename", help="Location to store all the metadata related to the training (to be used when testing).", default="config.txt")
 parser.add_option("--input_weight_path", dest="input_weight_path", help="Input path for weights for classifier model.")
@@ -62,10 +61,6 @@ if not options.model_name:
     parser.error("Pass --mn argument")
 if not options.path:
     parser.error("Pass -p argument")
-
-# define input of our network
-input_shape_img = (224, 224, 3)
-img_input = Input(shape=input_shape_img)
 
 if tf.__version__ == '2.1.0':
     physical_devices = tf.config.list_physical_devices('GPU')
@@ -113,22 +108,131 @@ with tf.device('/CPU:0'):
     print('Loading pre-trained weights...')
     if options.network == 'vgg16':
         from src.architectures import vgg16 as nn
+
+        # define input of our network
+        input_shape_img = (224, 224, 3)
+        img_input = Input(shape=input_shape_img)
+
         base_layers = VGG16(weights='imagenet', include_top=False, input_tensor=img_input)
         C.network = 'vgg16'
+
     elif options.network == 'vgg19':
         from src.architectures import vgg19 as nn
+
+        # define input of our network
+        input_shape_img = (224, 224, 3)
+        img_input = Input(shape=input_shape_img)
+
         base_layers = VGG19(weights='imagenet', include_top=False, input_tensor=img_input)
         C.network = 'vgg19'
     elif options.network == 'resnet50':
         from src.architectures import resnet50 as nn
+
+        # define input of our network
+        input_shape_img = (224, 224, 3)
+        img_input = Input(shape=input_shape_img)
+
         base_layers = ResNet50(weights='imagenet', include_top=False, input_tensor=img_input)
         C.network = 'resnet50'
     elif options.network == 'resnet152':
         from src.architectures import resnet152 as nn
+
+        # define input of our network
+        input_shape_img = (224, 224, 3)
+        img_input = Input(shape=input_shape_img)
+
         base_layers = ResNet152(weights='imagenet', include_top=False, input_tensor=img_input)
         C.network = 'resnet152'
+    elif options.network == 'efficientnet-b0':
+        from src.architectures import efficientnet as nn
+
+        # define input of our network
+        input_shape_img = (224, 224, 3)
+        img_input = Input(shape=input_shape_img)
+
+        base_layers = nn.nn_base(1.0, 1.0, input_tensor=img_input, dropout_rate=0.2)
+        base_layers = Model(img_input, base_layers)
+        base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b0_noisy-student_notop.h5")
+        C.network = 'efficientnet-b0'
+    elif options.network == 'efficientnet-b1':
+        from src.architectures import efficientnet as nn
+
+        # define input of our network
+        input_shape_img = (240, 240, 3)
+        img_input = Input(shape=input_shape_img)
+
+        base_layers = nn.nn_base(1.0, 1.1, input_tensor=img_input, dropout_rate=0.2)
+        base_layers = Model(img_input, base_layers)
+        base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b1_noisy-student_notop.h5")
+        C.network = 'efficientnet-b1'
+    elif options.network == 'efficientnet-b2':
+        from src.architectures import efficientnet as nn
+
+        # define input of our network
+        input_shape_img = (260, 260, 3)
+        img_input = Input(shape=input_shape_img)
+
+        base_layers = nn.nn_base(1.1, 1.2, input_tensor=img_input, dropout_rate=0.3)
+        base_layers = Model(img_input, base_layers)
+        base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b2_noisy-student_notop.h5")
+        C.network = 'efficientnet-b2'
+    elif options.network == 'efficientnet-b3':
+        from src.architectures import efficientnet as nn
+
+        # define input of our network
+        input_shape_img = (300, 300, 3)
+        img_input = Input(shape=input_shape_img)
+
+        base_layers = nn.nn_base(1.2, 1.4, input_tensor=img_input, dropout_rate=0.3)
+        base_layers = Model(img_input, base_layers)
+        base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b3_noisy-student_notop.h5")
+        C.network = 'efficientnet-b3'
+    elif options.network == 'efficientnet-b4':
+        from src.architectures import efficientnet as nn
+
+        # define input of our network
+        input_shape_img = (380, 380, 3)
+        img_input = Input(shape=input_shape_img)
+
+        base_layers = nn.nn_base(1.4, 1.8, input_tensor=img_input, dropout_rate=0.4)
+        base_layers = Model(img_input, base_layers)
+        base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b4_noisy-student_notop.h5")
+        C.network = 'efficientnet-b4'
+    elif options.network == 'efficientnet-b5':
+        from src.architectures import efficientnet as nn
+
+        # define input of our network
+        input_shape_img = (456, 456, 3)
+        img_input = Input(shape=input_shape_img)
+
+        base_layers = nn.nn_base(1.6, 2,2, input_tensor=img_input, dropout_rate=0.4)
+        base_layers = Model(img_input, base_layers)
+        base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b5_noisy-student_notop.h5")
+        C.network = 'efficientnet-b5'
+    elif options.network == 'efficientnet-b6':
+        from src.architectures import efficientnet as nn
+
+        # define input of our network
+        input_shape_img = (528, 528, 3)
+        img_input = Input(shape=input_shape_img)
+
+        base_layers = nn.nn_base(1.8, 2.6, input_tensor=img_input, dropout_rate=0.5)
+        base_layers = Model(img_input, base_layers)
+        base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b6_noisy-student_notop.h5")
+        C.network = 'efficientnet-b6'
+    elif options.network == 'efficientnet-b7':
+        from src.architectures import efficientnet as nn
+
+        # define input of our network
+        input_shape_img = (600, 600, 3)
+        img_input = Input(shape=input_shape_img)
+
+        base_layers = nn.nn_base(2.0, 3.1, input_tensor=img_input, dropout_rate=0.5)
+        base_layers = Model(img_input, base_layers)
+        base_layers.load_weights("https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b7_noisy-student_notop.h5")
+        C.network = 'efficientnet-b7'
     else:
-        raise ValueError("Not a valid model was passed")
+        raise ValueError("Invalid model was passed")
 
     if options.input_weight_path:
         C.base_net_weights = options.input_weight_path
@@ -172,7 +276,7 @@ with tf.device('/CPU:0'):
     labels = binarizer.transform(labels)
     labels = to_categorical(labels)
 
-    print('Splitting')
+    print('Splitting...')
     x_train, x_test, y_train, y_test = train_test_split(data, labels,
                                                         test_size=0.30,
                                                         stratify=labels,
